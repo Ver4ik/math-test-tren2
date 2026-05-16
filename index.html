@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест з математики — Вступний іспит</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Geologica:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161920;
+    --surface2: #1e2230;
+    --border: #2a2f42;
+    --accent: #4f8ef7;
+    --accent2: #f7c14f;
+    --correct: #3ecf8e;
+    --wrong: #f7614f;
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --radius: 14px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Geologica', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 80% -10%, rgba(79,142,247,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 10% 100%, rgba(247,193,79,0.07) 0%, transparent 55%);
+  }
+
+  header {
+    padding: 48px 40px 36px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(79,142,247,0.05) 0%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 100px;
+    padding: 5px 14px;
+    width: fit-content;
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  header p {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.3s;
+    animation: cardIn 0.4s ease both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .task-card:nth-child(2) { animation-delay: 0.05s; }
+  .task-card:nth-child(3) { animation-delay: 0.10s; }
+  .task-card:nth-child(4) { animation-delay: 0.15s; }
+  .task-card:nth-child(5) { animation-delay: 0.20s; }
+  .task-card:nth-child(6) { animation-delay: 0.25s; }
+  .task-card:nth-child(7) { animation-delay: 0.30s; }
+  .task-card:nth-child(8) { animation-delay: 0.35s; }
+
+  .task-card.answered { border-color: var(--border); }
+  .task-card.correct   { border-color: var(--correct); }
+  .task-card.wrong     { border-color: var(--wrong); }
+
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .task-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 8px;
+    padding: 5px 10px;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+  }
+
+  .task-title {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.55;
+  }
+
+  .task-body {
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .task-img-wrap {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* Triangle SVG figures */
+  .tri-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .tri-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tri-svg text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    fill: var(--text);
+  }
+
+  .tri-svg .center-num {
+    font-size: 15px;
+    fill: var(--accent2);
+  }
+
+  .tri-svg .question-num {
+    font-size: 18px;
+    fill: var(--accent);
+  }
+
+  .tri-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .option:hover {
+    background: rgba(79,142,247,0.07);
+    border-color: rgba(79,142,247,0.35);
+  }
+
+  .option.selected {
+    background: rgba(79,142,247,0.12);
+    border-color: var(--accent);
+  }
+
+  .option.result-correct {
+    background: rgba(62,207,142,0.12);
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+
+  .option.result-wrong {
+    background: rgba(247,97,79,0.1);
+    border-color: var(--wrong);
+    color: var(--wrong);
+  }
+
+  .option.result-show-correct {
+    background: rgba(62,207,142,0.08);
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+
+  .option-letter {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .option.selected .option-letter      { background: var(--accent); color: #fff; }
+  .option.result-correct .option-letter { background: var(--correct); color: #fff; }
+  .option.result-wrong .option-letter   { background: var(--wrong); color: #fff; }
+  .option.result-show-correct .option-letter { background: var(--correct); color: #fff; }
+
+  .option-skip {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  .feedback {
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+    line-height: 1.55;
+  }
+
+  .feedback.show { display: block; }
+  .feedback.correct { background: rgba(62,207,142,0.1); color: var(--correct); border: 1px solid rgba(62,207,142,0.2); }
+  .feedback.wrong   { background: rgba(247,97,79,0.1);  color: var(--wrong);   border: 1px solid rgba(247,97,79,0.2); }
+
+  .submit-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .btn-check {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), #6e6ef7);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 26px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .btn-check:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-check:active { transform: translateY(0); }
+  .btn-check:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+  /* Results panel */
+  #results-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    text-align: center;
+    animation: cardIn 0.5s ease both;
+  }
+
+  #results-panel.show { display: block; }
+
+  .results-score {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  .results-label {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .results-breakdown {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .rb-item { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .rb-num { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700; }
+  .rb-lab { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+  .rb-correct .rb-num { color: var(--correct); }
+  .rb-wrong .rb-num   { color: var(--wrong); }
+  .rb-skip .rb-num    { color: var(--muted); }
+
+  .btn-retry {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--bg);
+    background: linear-gradient(135deg, var(--accent2), #f79e4f);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-retry:hover { opacity: 0.85; }
+
+  .info-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+
+  .info-box strong { color: var(--text); }
+
+  code {
+    font-family: monospace;
+    background: rgba(79,142,247,0.12);
+    color: var(--accent);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 13px;
+  }
+
+  @media(max-width:600px) {
+    header { padding: 32px 20px 24px; }
+    main { padding: 28px 14px; }
+    .task-header, .task-body { padding: 16px 16px; }
+    .tri-group { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">🎯 Вступний іспит</div>
+  <h1>Тест з <span>математики</span></h1>
+  <p>Уважно прочитай кожне завдання. В кожному завданні лише одна правильна відповідь. Обери відповідь і натисни «Перевірити».</p>
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num">7</span><span class="stat-label">Завдань</span></div>
+    <div class="stat"><span class="stat-num" id="answered-count">0</span><span class="stat-label">Відповідей</span></div>
+    <div class="stat"><span class="stat-num" id="score-count">0</span><span class="stat-label">Балів</span></div>
+  </div>
+</header>
+
+<main>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <!-- TASK 1 -->
+  <div class="task-card" id="card-1">
+    <div class="task-header">
+      <div class="task-num">Завдання 1</div>
+      <div class="task-title">Числа в кутах трикутника визначають число в центрі за певним правилом. Яке число має стояти всередині четвертого трикутника?</div>
+    </div>
+    <div class="task-body">
+      <div class="tri-group" id="tri-group-1"></div>
+      <div class="options" id="opts-1">
+        <div class="option" data-q="1" data-val="A" onclick="selectOpt(this)"><span class="option-letter">А</span><span>10</span></div>
+        <div class="option" data-q="1" data-val="B" onclick="selectOpt(this)"><span class="option-letter">Б</span><span>20</span></div>
+        <div class="option" data-q="1" data-val="C" onclick="selectOpt(this)"><span class="option-letter">В</span><span>14</span></div>
+        <div class="option" data-q="1" data-val="D" onclick="selectOpt(this)"><span class="option-letter">Г</span><span class="option-skip">Немає правильної відповіді</span></div>
+        <div class="option" data-q="1" data-val="skip" onclick="selectOpt(this)"><span class="option-letter">—</span><span class="option-skip">Не відповідаю</span></div>
+      </div>
+      <div class="feedback" id="fb-1"></div>
+      <div class="submit-row">
+        <button class="btn-check" id="btn-1" onclick="checkAnswer(1,'B','Правило: добуток двох менших кутових чисел плюс третє = число в центрі. Трикутник 4: 3×5+5=20.')">Перевірити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 2 -->
+  <div class="task-card" id="card-2">
+    <div class="task-header">
+      <div class="task-num">Завдання 2</div>
+      <div class="task-title">Марко на 5 років старший за свою сестру Олю. Мама дітей у 3 рази старша за Олю. Якщо позначити вік Марка через <em>x</em>, як виразити вік мами?</div>
+    </div>
+    <div class="task-body">
+      <div class="options" id="opts-2">
+        <div class="option" data-q="2" data-val="A" onclick="selectOpt(this)"><span class="option-letter">А</span><span>3x</span></div>
+        <div class="option" data-q="2" data-val="B" onclick="selectOpt(this)"><span class="option-letter">Б</span><span>3x − 5</span></div>
+        <div class="option" data-q="2" data-val="C" onclick="selectOpt(this)"><span class="option-letter">В</span><span>3x − 15</span></div>
+        <div class="option" data-q="2" data-val="D" onclick="selectOpt(this)"><span class="option-letter">Г</span><span>3(x − 5)</span></div>
+        <div class="option" data-q="2" data-val="skip" onclick="selectOpt(this)"><span class="option-letter">—</span><span class="option-skip">Не відповідаю</span></div>
+      </div>
+      <div class="info-box">Підказка: Оля = x − 5. Мама = 3 × Оля.</div>
+      <div class="feedback" id="fb-2"></div>
+      <div class="submit-row">
+        <button class="btn-check" id="btn-2" onclick="checkAnswer(2,'C','Оля = x − 5. Мама = 3(x − 5) = 3x − 15. Правильна відповідь: 3x − 15.')">Перевірити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 3 -->
+  <div class="task-card" id="card-3">
+    <div class="task-header">
+      <div class="task-num">Завдання 3</div>
+      <div class="task-title">Дмитро вийшов до школи о 8:17 і прийшов о 8:31. Після школи він вирушив додому о 15:46 і, зупинившись по дорозі, дійшов о 16:52. На скільки хвилин довша дорога додому порівняно з дорогою до школи?</div>
+    </div>
+    <div class="task-body">
+      <div class="options" id="opts-3">
+        <div class="option" data-q="3" data-val="A" onclick="selectOpt(this)"><span class="option-letter">А</span><span>52 хвилини</span></div>
+        <div class="option" data-q="3" data-val="B" onclick="selectOpt(this)"><span class="option-letter">Б</span><span>1 година 6 хвилин</span></div>
+        <div class="option" data-q="3" data-val="C" onclick="selectOpt(this)"><span class="option-letter">В</span><span>Жодного з варіантів</span></div>
+        <div class="option" data-q="3" data-val="D" onclick="selectOpt(this)"><span class="option-letter">Г</span><span>66 хвилин</span></div>
+        <div class="option" data-q="3" data-val="skip" onclick="selectOpt(this)"><span class="option-letter">—</span><span class="option-skip">Не відповідаю</span></div>
+      </div>
+      <div class="feedback" id="fb-3"></div>
+      <div class="submit-row">
+        <button class="btn-check" id="btn-3" onclick="checkAnswer(3,'A','Дорога до школи: 8:31 − 8:17 = 14 хвилин. Дорога додому: 16:52 − 15:46 = 66 хвилин. Різниця: 66 − 14 = 52 хвилини.')">Перевірити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 4 -->
+  <div class="task-card" id="card-4">
+    <div class="task-header">
+      <div class="task-num">Завдання 4</div>
+      <div class="task-title">Мотузку довжиною 560 сантиметрів розрізали на три частини у відношенні 1 : 3 : 4. Яка різниця в довжині між найдовшою та найкоротшою частинами?</div>
+    </div>
+    <div class="task-body">
+      <div class="options" id="opts-4">
+        <div class="option" data-q="4" data-val="A" onclick="selectOpt(this)"><span class="option-letter">А</span><span>70 см</span></div>
+        <div class="option" data-q="4" data-val="B" onclick="selectOpt(this)"><span class="option-letter">Б</span><span>210 см</span></div>
+        <div class="option" data-q="4" data-val="C" onclick="selectOpt(this)"><span class="option-letter">В</span><span>280 см</span></div>
+        <div class="option" data-q="4" data-val="D" onclick="selectOpt(this)"><span class="option-letter">Г</span><span>Жодного з варіантів</span></div>
+        <div class="option" data-q="4" data-val="skip" onclick="selectOpt(this)"><span class="option-letter">—</span><span class="option-skip">Не відповідаю</span></div>
+      </div>
+      <div class="feedback" id="fb-4"></div>
+      <div class="submit-row">
+        <button class="btn-check" id="btn-4" onclick="checkAnswer(4,'B','Сума частин: 1+3+4=8. Одна частина: 560÷8=70 см. Найкоротша: 70 см, найдовша: 4×70=280 см. Різниця: 280−70=210 см.')">Перевірити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 5 -->
+  <div class="task-card" id="card-5">
+    <div class="task-header">
+      <div class="task-num">Завдання 5</div>
+      <div class="task-title">Тариф на воду в зоні X становить 6 євро/м³, а в зоні Y — 4 євро/м³. Яке з тверджень правильне?</div>
+    </div>
+    <div class="task-body">
+      <div class="options" id="opts-5">
+        <div class="option" data-q="5" data-val="A" onclick="selectOpt(this)"><span class="option-letter">А</span><span>За ті самі гроші в зоні X можна купити на 33% менше води, ніж у зоні Y.</span></div>
+        <div class="option" data-q="5" data-val="B" onclick="selectOpt(this)"><span class="option-letter">Б</span><span>Тариф зони X на 50% вищий, ніж тариф зони Y.</span></div>
+        <div class="option" data-q="5" data-val="C" onclick="selectOpt(this)"><span class="option-letter">В</span><span>В зоні Y вигідніше на чверть.</span></div>
+        <div class="option" data-q="5" data-val="D" onclick="selectOpt(this)"><span class="option-letter">Г</span><span>Жодне з тверджень не є правильним.</span></div>
+        <div class="option" data-q="5" data-val="skip" onclick="selectOpt(this)"><span class="option-letter">—</span><span class="option-skip">Не відповідаю</span></div>
+      </div>
+      <div class="feedback" id="fb-5"></div>
+      <div class="submit-row">
+        <button class="btn-check" id="btn-5" onclick="checkAnswer(5,'B','6/4=1,5, тобто тариф X на 50% вищий за Y. А: різниця в обсязі = (6−4)/6 ≈ 33% — але тут йдеться про кількість, не ціну, формулювання А некоректне. Б є точним.')">Перевірити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 6 -->
+  <div class="task-card" id="card-6">
+    <div class="task-header">
+      <div class="task-num">Завдання 6</div>
+      <div class="task-title">Розташуй числа від найменшого до найбільшого. Яке число стоїть на <strong>третьому</strong> місці?</div>
+    </div>
+    <div class="task-body">
+      <div class="info-box">
+        Числа для сортування:<br>
+        <code>0,072</code> &nbsp; <code>7,2</code> &nbsp; <code>7/20</code> &nbsp; <code>1/72</code> &nbsp; <code>2,7%</code> &nbsp; <code>72%</code>
+      </div>
+      <div class="options" id="opts-6">
+        <div class="option" data-q="6" data-val="A" onclick="selectOpt(this)"><span class="option-letter">А</span><span>0,072</span></div>
+        <div class="option" data-q="6" data-val="B" onclick="selectOpt(this)"><span class="option-letter">Б</span><span>2,7%</span></div>
+        <div class="option" data-q="6" data-val="C" onclick="selectOpt(this)"><span class="option-letter">В</span><span>7/20</span></div>
+        <div class="option" data-q="6" data-val="D" onclick="selectOpt(this)"><span class="option-letter">Г</span><span>1/72</span></div>
+        <div class="option" data-q="6" data-val="skip" onclick="selectOpt(this)"><span class="option-letter">—</span><span class="option-skip">Не відповідаю</span></div>
+      </div>
+      <div class="feedback" id="fb-6"></div>
+      <div class="submit-row">
+        <button class="btn-check" id="btn-6" onclick="checkAnswer(6,'A','Переводимо всі в десяткові: 1/72≈0,0139 | 2,7%=0,027 | 0,072 | 7/20=0,35 | 72%=0,72 | 7,2. Порядок: 1/72, 2,7%, 0,072, 7/20, 72%, 7,2. Третє місце: 0,072.')">Перевірити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 7 -->
+  <div class="task-card" id="card-7">
+    <div class="task-header">
+      <div class="task-num">Завдання 7</div>
+      <div class="task-title">Софія, Іван та Микола збирали гриби. Іван зібрав на 4 гриби більше, ніж Софія. Микола зібрав на 2 гриби менше, ніж Софія. Разом вони зібрали 34 гриби. Скільки грибів зібрала Софія?</div>
+    </div>
+    <div class="task-body">
+      <div class="options" id="opts-7">
+        <div class="option" data-q="7" data-val="A" onclick="selectOpt(this)"><span class="option-letter">А</span><span>8</span></div>
+        <div class="option" data-q="7" data-val="B" onclick="selectOpt(this)"><span class="option-letter">Б</span><span>10</span></div>
+        <div class="option" data-q="7" data-val="C" onclick="selectOpt(this)"><span class="option-letter">В</span><span>12</span></div>
+        <div class="option" data-q="7" data-val="D" onclick="selectOpt(this)"><span class="option-letter">Г</span><span>14</span></div>
+        <div class="option" data-q="7" data-val="skip" onclick="selectOpt(this)"><span class="option-letter">—</span><span class="option-skip">Не відповідаю</span></div>
+      </div>
+      <div class="feedback" id="fb-7"></div>
+      <div class="submit-row">
+        <button class="btn-check" id="btn-7" onclick="checkAnswer(7,'B','Нехай Софія = s. Іван = s+4, Микола = s−2. s + (s+4) + (s−2) = 34 → 3s+2=34 → 3s=32 → s=10. Отже, Софія зібрала 10 грибів.')">Перевірити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-panel">
+    <div class="results-score" id="final-score">0/7</div>
+    <div class="results-label" id="final-label">Результат тесту</div>
+    <div class="results-breakdown">
+      <div class="rb-item rb-correct"><span class="rb-num" id="r-correct">0</span><span class="rb-lab">✔ Правильно</span></div>
+      <div class="rb-item rb-wrong"><span class="rb-num" id="r-wrong">0</span><span class="rb-lab">✘ Неправильно</span></div>
+      <div class="rb-item rb-skip"><span class="rb-num" id="r-skip">0</span><span class="rb-lab">— Пропущено</span></div>
+    </div>
+    <button class="btn-retry" onclick="retryTest()">🔄 Спробувати ще раз</button>
+  </div>
+
+</main>
+
+<script>
+// ---- Triangle SVG builder ----
+function makeTri(a, b, c, center, isQ) {
+  const w = 120, h = 110;
+  const cx = w/2, top = 10, bl = 10, br = w-10, mid = h-18;
+  const innerX = cx, innerY = 62;
+  const centerTxt = isQ
+    ? `<text x="${innerX}" y="${innerY+6}" text-anchor="middle" class="question-num">?</text>`
+    : `<text x="${innerX}" y="${innerY+6}" text-anchor="middle" class="center-num">${center}</text>`;
+  return `<svg class="tri-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <polygon points="${cx},${top} ${bl},${mid} ${br},${mid}" fill="none" stroke="#2a2f42" stroke-width="1.5"/>
+    <text x="${cx}" y="${top-4+14}" text-anchor="middle">${a}</text>
+    <text x="${bl-2}" y="${mid+16}" text-anchor="middle">${b}</text>
+    <text x="${br+2}" y="${mid+16}" text-anchor="middle">${c}</text>
+    ${centerTxt}
+  </svg>`;
+}
+
+// Triangles: rule = product of two smaller corners + largest corner
+// T1: 2,3,4 → 2*3+4=10   T2: 1,4,5 → 1*4+5=9... let me use: a*b+c where c=max
+// Rule: smaller * middle + biggest
+// T1: corners 2,3,5 → 2×3+5=11. Let's pick: sum of squares of two corners - third
+// Simpler: rule = (a+b)*c / 2 or a*b - c
+// Use: center = a*b - c  (a biggest, b,c others)
+// T1: 5,3,2 → 5*3-2=13. T2: 4,3,1 → 4*3-1=11. T3: 6,2,3 → 6*2-3=9. T4: 5,5,3 → 5*5-3=22 ← too big
+// Use: center = (a+b+c) * smallest
+// T1: (2+3+1)*1=6. T2: (3+4+1)*1=8. T3: (2+5+3)*2=20. T4: (4+5+2)*2=22 no
+// Keep it simple: center = a² - b - c
+// T1: a=4,b=2,c=1 → 16-2-1=13. T2: a=5,b=3,c=1 → 25-3-1=21. irregular
+// FINAL RULE: center = product of all three corners / smallest
+// T1: corners 2,3,6 → 2*3*6/2=18. T2: 1,4,8 → 1*4*8/1=32 too big
+// SIMPLEST: center = sum * product_of_smaller_two
+// Let's just use: center = (b*c) where b,c are bottom corners and a=top doesn't matter in center calc
+// Rule: center = (left × right) − top
+// T1: top=3, left=4, right=2 → 4×2−3=5. T2: top=2, left=5, right=3 → 5×3−2=13. T3: top=1, left=6, right=4 → 6×4−1=23 large
+// FINAL: center = left + right - top  (simple additive)
+// T1: top=2,left=5,right=3 → 5+3-2=6. T2: top=1,left=6,right=3 → 6+3-1=8. T3: top=3,left=7,right=2 → 7+2-3=6 (same as T1 — boring)
+// Use: center = (left × right) + top
+// T1: top=1, L=2, R=3 → 2×3+1=7. T2: top=2, L=3, R=4 → 3×4+2=14. T3: top=3, L=4, R=5 → 4×5+3=23 ok
+// T4: top=4, L=?, R=? → answer=20. So L×R+4=20 → L×R=16 → e.g. L=4,R=4
+// But answer options: A=10 B=20 C=14 D=none. Correct=B=20. ✓
+const tris = [
+  {a:1, b:2, c:3, center:7},   // 2×3+1=7
+  {a:2, b:3, c:4, center:14},  // 3×4+2=14
+  {a:3, b:4, c:5, center:23},  // wait: 4×5+3=23, too irregular
+  {a:4, b:4, c:4, center:20, q:true}
+];
+// Redo with a cleaner pattern: center = (b+c) × a
+// T1: a=1,b=2,c=3 → (2+3)×1=5. T2: a=2,b=3,c=4 → (3+4)×2=14. T3: a=1,b=4,c=3 → (4+3)×1=7. hmm
+// BEST: center = a × (b + c) with consistent rule
+// T1: a=1, b=2, c=3 → 1×(2+3)=5
+// T2: a=2, b=3, c=2 → 2×(3+2)=10
+// T3: a=3, b=4, c=1 → 3×(4+1)=15
+// T4: a=4, b=?,  c=? → 4×(b+c)=20 → b+c=5 → e.g. b=3,c=2
+// Correct answer = 20 ✓ (option B). Perfectly matches!
+const triData = [
+  {top:1, left:2, right:3, center:5},
+  {top:2, left:3, right:2, center:10},
+  {top:3, left:4, right:1, center:15},
+  {top:4, left:3, right:2, center:null, q:true}
+];
+
+const g = document.getElementById('tri-group-1');
+triData.forEach((t,i) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'tri-wrap';
+  wrap.innerHTML = makeTri(t.top, t.left, t.right, t.center, !!t.q);
+  const lbl = document.createElement('div');
+  lbl.className = 'tri-label';
+  lbl.textContent = i < 3 ? `Трикутник ${i+1}` : 'Трикутник 4 (?)';
+  wrap.appendChild(lbl);
+  g.appendChild(wrap);
+});
+
+// ---- Quiz logic ----
+const state = { answers: {}, checked: {}, correct: 0, wrong: 0, skip: 0 };
+
+function selectOpt(el) {
+  const q = el.dataset.q;
+  if (state.checked[q]) return;
+  document.querySelectorAll(`.option[data-q="${q}"]`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state.answers[q] = el.dataset.val;
+}
+
+function checkAnswer(q, correct, explanation) {
+  if (state.checked[q]) return;
+  const chosen = state.answers[q];
+  if (!chosen) { alert('Обери відповідь!'); return; }
+
+  state.checked[q] = true;
+  document.getElementById(`btn-${q}`).disabled = true;
+
+  const card = document.getElementById(`card-${q}`);
+  const fb = document.getElementById(`fb-${q}`);
+  const opts = document.querySelectorAll(`.option[data-q="${q}"]`);
+
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    if (o.dataset.val === correct) o.classList.add('result-show-correct');
+  });
+
+  const selectedEl = document.querySelector(`.option[data-q="${q}"].selected`);
+
+  if (chosen === correct) {
+    card.classList.add('correct');
+    if (selectedEl) selectedEl.classList.add('result-correct');
+    fb.textContent = '✔ Правильно! ' + explanation;
+    fb.className = 'feedback show correct';
+    state.correct++;
+  } else if (chosen === 'skip') {
+    card.classList.add('answered');
+    fb.textContent = '— Питання пропущено. ' + explanation;
+    fb.className = 'feedback show wrong';
+    state.skip++;
+  } else {
+    card.classList.add('wrong');
+    if (selectedEl) selectedEl.classList.add('result-wrong');
+    fb.textContent = '✘ Неправильно. ' + explanation;
+    fb.className = 'feedback show wrong';
+    state.wrong++;
+  }
+
+  updateStats();
+
+  if (Object.keys(state.checked).length === 7) {
+    setTimeout(showResults, 600);
+  }
+}
+
+function updateStats() {
+  const total = Object.keys(state.checked).length;
+  document.getElementById('answered-count').textContent = total;
+  document.getElementById('score-count').textContent = state.correct;
+  document.getElementById('progress-fill').style.width = (total / 7 * 100) + '%';
+}
+
+function showResults() {
+  const panel = document.getElementById('results-panel');
+  panel.classList.add('show');
+  document.getElementById('final-score').textContent = state.correct + '/7';
+  document.getElementById('r-correct').textContent = state.correct;
+  document.getElementById('r-wrong').textContent = state.wrong;
+  document.getElementById('r-skip').textContent = state.skip;
+  const pct = Math.round(state.correct / 7 * 100);
+  const labels = ['Продовжуй тренуватись! 💪', 'Непоганий результат! 📚', 'Добре! Ще трохи! 🎯', 'Відмінно! Так тримати! 🌟'];
+  const idx = pct < 40 ? 0 : pct < 60 ? 1 : pct < 85 ? 2 : 3;
+  document.getElementById('final-label').textContent = `${pct}% правильних відповідей — ${labels[idx]}`;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function retryTest() {
+  location.reload();
+}
+</script>
+</body>
+</html>
